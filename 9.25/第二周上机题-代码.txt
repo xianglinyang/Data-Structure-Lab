@@ -1,0 +1,101 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+ // 第二周上机，第一题
+ListNode* swapPairs(ListNode* head) {
+    ListNode * p1 = nullptr;
+    ListNode * p2 = nullptr;
+    ListNode * former = nullptr;
+    ListNode * later = nullptr;
+
+    if ( head && head->next) {  //两个及以上节点的列表
+        //处理刚开始的两个节点
+        p1 = head;
+        p2 = p1->next;
+
+        later = p2->next;
+        p2->next = p1;
+        p1->next = later;
+
+        head = p2;
+        
+        former = p1;
+        p1 = former->next;
+        p2 = p1 ? p1->next : nullptr;
+        later = p2 ? p2->next : nullptr;
+        while (p1 && p2) {
+            //交换节点
+            former->next = p2;
+            p1->next = later;
+            p2->next = p1;
+            //更新，为下一次循环做准备
+            former = p1;
+            p1 = former->next;
+            p2 = p1 ? p1->next : nullptr;
+            later = p2 ? p2->next : nullptr;
+        }
+        return head;
+    }
+    else return head;  //空链表或一个节点的链表
+}
+
+///////////////////////////////////////////////
+
+// 第二周上机，第二题
+/* k=3, swap three nodes 678, get 876
+ * ... 3      6       7       8    9 ...
+ *     |      |       |       |    |
+ *   i_former i    j_former   j    other nodes
+ */
+ListNode* reverseKGroup(ListNode* head, int k) {
+    auto * fake_head = new ListNode(-9999);
+    fake_head->next = head;
+
+    ListNode * i_former = fake_head;
+    ListNode * i = head;
+    ListNode * j_former = fake_head;
+    ListNode * j = i;
+
+    ListNode * p = nullptr;
+
+    while (i && j) {
+        // Move j_former and j to k behind i
+        for (int c = 0; c < k-1; c++) {
+            j_former = j_former->next;
+            j = j->next;
+
+            if (!j) return fake_head->next;
+        }
+
+        // Swap k notes
+        while (j != i) {
+            j_former->next = j->next;
+            j->next = i_former->next;
+            i_former->next = j;
+
+            // Update i_former and j
+            i_former = j;
+            j = j_former;
+            // Update j_former
+            p = i_former;
+            while (p->next != j && i != j) {
+                p = p->next;
+            }
+            j_former = p;
+        }
+
+        // Move i to next k nodes
+        i_former = i;
+        i = i_former->next;
+        j_former = i_former;
+        j = i;
+    }
+
+    return fake_head->next;
+}
